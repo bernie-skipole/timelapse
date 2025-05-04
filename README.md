@@ -15,10 +15,19 @@ Solar panel plus battery with raspberry pi with camera, all boxed up and mounted
 
 Pi in low-power mode apart from brief mid-day on-time for the photo, plus an evening on-time to give myself a chance to connect and pull down photo’s or do any changes.
 
+
+Current status:
+
+writing and testing code to wake around 12:00 and 18:00 each day for ten minutes.
+
 To consider:
 
 Solar panel, battery, power management.
+
 I should be able to get wifi to garden, but may need an external antenna.
+
 Which camera, and its protection: glass covering or naked lens.
+
 The physical box and mount.
+
 RTC battery
