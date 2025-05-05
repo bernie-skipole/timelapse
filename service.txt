@@ -2,7 +2,7 @@ create a file :
 
 /lib/systemd/system/power.service
 
-containing the following:
+containing the following (with paths adjusted for your own script location):
 
 
     [Unit]
