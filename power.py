@@ -14,6 +14,9 @@
     $ sudo halt
 
     ----------------------------------------------------------------
+    For photo taking, see
+    https://datasheets.raspberrypi.com/camera/picamera2-manual.pdf
+    ----------------------------------------------------------------
 
    This script starts as a service on boot (run as root).
 
@@ -64,6 +67,7 @@ def takephoto(timestamp):
 
     filepath = IMAGES / filename
 
+    # Note, currently a timestamp is saved rather than a photo
     filepath.write_bytes(timestampstring.encode("UTF-8"))
 
 
@@ -118,6 +122,7 @@ if __name__ == "__main__":
 
     print("Starting")
 
+    # this takes photo if time is right, and returns epoch of next wake up time
     epoch = get_epoch()
 
     print(f"Setting wakealarm at epoch {epoch}")
@@ -128,7 +133,7 @@ if __name__ == "__main__":
 
     path = pathlib.Path("/sys/class/rtc/rtc0/wakealarm")
     # clear current wakealarm
-    path.write_bytes(str(0).encode("UTF-8"))
+    path.write_bytes("0".encode("UTF-8"))
     # and write new time
     path.write_bytes(str(epoch).encode("UTF-8"))
     print("Requesting shutdown")
