@@ -122,7 +122,11 @@ if __name__ == "__main__":
 
     print("Starting")
 
-    # this takes photo if time is right, and returns epoch of next wake up time
+    # wait four minutes on boot to allow user to interrupt things.
+    time.sleep(240)
+
+    # this takes photo if time is right, and if the current time is 'on-time'
+    # it waits until 'off-time' then returns epoch of next wake up time
     epoch = get_epoch()
 
     print(f"Setting wakealarm at epoch {epoch}")
