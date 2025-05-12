@@ -21,9 +21,9 @@
    This script starts as a service on boot (run as root).
 
    If the hour is 12, and no photo taken yet, then take it
-   Checks if the current time is outside the 'on' time of around midday and
-   18:00, and if it is outside, it sets the next boot time into the
-   RTC and powers off.
+   Checks if the current time is outside the 'on' time of around 10 minutes midday
+   and ten minutes around 18:00, and if it is outside, it sets the next boot
+   time into the RTC and powers off.
 
    If is inside one of the wakeful times, it waits 5 seconds and tests again.
 
@@ -60,7 +60,10 @@ IMAGES = pathlib.Path("/home/bernard/git/timelapse/images")
 
 
 def takephoto(timestamp):
-    "Takes a photo"
+    """Takes a photo, and places it into the folder given by global variable IMAGES
+       the timestamp is used to create the filename
+    """
+
     timestampstring = timestamp.strftime('%Y%m%d_%H_%M_%S')
 
     filename =  f"image_{timestampstring}.txt"
@@ -72,7 +75,11 @@ def takephoto(timestamp):
 
 
 def get_epoch():
-    "Takes photo at 12, returns epoch in seconds when the pi should be powered up"
+    """If the current time is between 11:50 and 12:05, wait, takes photo at 12:00
+       If the current time is between 17:55 and 18:10, wait.
+       Returns epoch in seconds when the pi should next be powered up, this is
+       either at 11:55 or 18:00 depending on which is next.
+    """
 
     photo_taken = False
 
@@ -122,25 +129,32 @@ if __name__ == "__main__":
 
     print("Starting")
 
-    # wait four minutes on boot to allow user to interrupt things.
+    # wait four minutes on boot to allow a user to boot the pi, remote connect,
+    # and if required stop the shutdown.
     time.sleep(240)
 
-    # this takes photo if time is right, and if the current time is 'on-time'
-    # it waits until 'off-time' then returns epoch of next wake up time
+    # After the four minutes, if time is right (12:00 midday) this takes photo, and if the current
+    # time is 'on-time' it waits until 'off-time' then returns the epoch of next wake up time.
+    # This on-time gives a remote user a chance to connect if required.
+    # If the current time is already an 'off-time', it returns immediately with the epoch of
+    # next wake up time.
     epoch = get_epoch()
 
+    # print a message with the epoch of the next on-time
     print(f"Setting wakealarm at epoch {epoch}")
-
     ontime = datetime.fromtimestamp(epoch).strftime('%Y%m%d %H:%M:%S')
-
     print(f"Which is at {ontime} local time")
 
+    # set the wakeup time into the RTC
     path = pathlib.Path("/sys/class/rtc/rtc0/wakealarm")
     # clear current wakealarm
     path.write_bytes("0".encode("UTF-8"))
     # and write new time
     path.write_bytes(str(epoch).encode("UTF-8"))
+
+    # shutdown after one minute. This is broadcast to any connected user
+    # and gives a user the chance to stop it with
+    # sudo shutdown -c
     print("Requesting shutdown")
     subprocess.run(["shutdown", "+1"])
-    print("Shutting Down")
     sys.exit(0)
