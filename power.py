@@ -20,12 +20,13 @@
 
    This script starts as a service on boot (run as root).
 
-   If the hour is 12, and no photo taken yet, then take it
-   Checks if the current time is outside the 'on' time of around 10 minutes midday
-   and ten minutes around 18:00, and if it is outside, it sets the next boot
+   If the hour is 12, take photo, and set
+   the next on time to 18:00 and power off.
+   Checks if the current time is outside the 'on' time of around
+   ten minutes around 18:00, and if it is outside, it sets the next boot
    time into the RTC and powers off.
 
-   If is inside one of the wakeful times, it waits 5 seconds and tests again.
+   If is inside the on time, it waits 5 seconds and tests again.
 
    Note, all times are obtained with timezone.utc, if using this in other
    timezones, this must be altered accordingly.
@@ -36,7 +37,7 @@
 
    Loop:
 
-        If the hour is 12, and no photo taken yet, then take it
+        If the hour is 12, and no photo taken yet, then take it, shut down.
 
         If current time is between 12:05 and 17:55:
               Set RTC to turn Pi on at 18:00
@@ -64,14 +65,18 @@ def takephoto(timestamp):
        the timestamp is used to create the filename
     """
 
-    timestampstring = timestamp.strftime('%Y%m%d_%H_%M_%S')
+    timestampstring = timestamp.strftime('%Y%m%d')
 
     filename =  f"image_{timestampstring}.txt"
 
     filepath = IMAGES / filename
 
+    if filepath.exists():
+        # This file has already been created
+        return
+
     # Note, currently a timestamp is saved rather than a photo
-    filepath.write_bytes(timestampstring.encode("UTF-8"))
+    filepath.write_bytes(timestamp.strftime('%Y%m%d_%H_%M_%S').encode("UTF-8"))
 
 
 def get_epoch():
@@ -81,23 +86,24 @@ def get_epoch():
        either at 11:55 or 18:00 depending on which is next.
     """
 
-    photo_taken = False
 
     while True:
 
         timestamp = datetime.now(tz=TIMEZONE)
 
-        if not photo_taken and timestamp.hour == 12:
-            # If the hour hits 12, and the photo has not yet been taken, then take it
+        if timestamp.hour == 12:
+            # If the hour hits 12, take the photo
             takephoto(timestamp)
-            photo_taken = True
+            # Set RTC to turn Pi on at 18:00
+            evetime = datetime(timestamp.year, timestamp.month, timestamp.day, hour=18, tzinfo=TIMEZONE)
+            # evetime in epoch seconds
+            epoch = int(evetime.timestamp())
+            return epoch
 
-
-        # test if current time > 12:05   and < 17:55
+        # test if current time >= 12:00   and < 17:55
         # If so, set on-time to 18:00
 
-        if ((timestamp.hour >= 13 and timestamp.hour < 17) or
-            (timestamp.hour == 12 and timestamp.minute > 5) or
+        if ((timestamp.hour >= 12 and timestamp.hour < 17) or
             (timestamp.hour == 17 and timestamp.minute < 55)):
             # Set RTC to turn Pi on at 18:00
             evetime = datetime(timestamp.year, timestamp.month, timestamp.day, hour=18, tzinfo=TIMEZONE)
@@ -113,7 +119,7 @@ def get_epoch():
             (timestamp.hour == 18 and timestamp.minute > 10)):
             # Set RTC to turn Pi on at 11:55
             midday = datetime(timestamp.year, timestamp.month, timestamp.day, hour=11, minute=55, tzinfo=TIMEZONE)
-            if timestamp.hour > 12:
+            if timestamp.hour >= 18:
                 # get midday of next day
                 midday = midday + timedelta(days=1)
             epoch = int(midday.timestamp())
@@ -121,7 +127,6 @@ def get_epoch():
 
         # still on-time, wait 5 seconds and continue
         time.sleep(5)
-
 
 
 
@@ -133,9 +138,10 @@ if __name__ == "__main__":
     # and if required stop the shutdown.
     time.sleep(240)
 
-    # After the four minutes, if time is right (12:00 midday) this takes photo, and if the current
-    # time is 'on-time' it waits until 'off-time' then returns the epoch of next wake up time.
-    # This on-time gives a remote user a chance to connect if required.
+    # After the four minutes, if time is right (12:00 midday) this takes photo and returns with the epoch of 18:00
+    # If the current time is 'on-time' within the ten minutes after 18:00 it waits until 'off-time' then returns
+    # the epoch of next wake up time at 11:55 the next day.
+    # This on-time around 18:00 gives a remote user a chance to connect if required.
     # If the current time is already an 'off-time', it returns immediately with the epoch of
     # next wake up time.
     epoch = get_epoch()
