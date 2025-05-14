@@ -80,10 +80,15 @@ def takephoto(timestamp):
 
 
 def get_epoch():
-    """If the current time is between 11:50 and 12:05, wait, takes photo at 12:00
-       If the current time is between 17:55 and 18:10, wait.
-       Returns epoch in seconds when the pi should next be powered up, this is
+    """Returns epoch in seconds when the pi should next be powered up, this is
        either at 11:55 or 18:00 depending on which is next.
+
+       If the current hour is 12, takes photo, set epoch to 18:00, return
+       If the current time is between 12:00 and 17:55, set epoch to 18:00, return
+       If current time > 18:10 or < 11:50, set epoch to the following 11:55, return
+
+       If none of the above, wait five seconds and test again. This ensures the pi
+       is on and available for remote connection between 18:00 and 18:10.
     """
 
 
@@ -100,7 +105,7 @@ def get_epoch():
             epoch = int(evetime.timestamp())
             return epoch
 
-        # test if current time >= 12:00   and < 17:55
+        # test if current time >= 12:00 and < 17:55
         # If so, set on-time to 18:00
 
         if ((timestamp.hour >= 12 and timestamp.hour < 17) or
