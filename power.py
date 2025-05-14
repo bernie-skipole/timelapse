@@ -39,7 +39,7 @@
 
         If the hour is 12, and no photo taken yet, then take it, shut down.
 
-        If current time is between 12:05 and 17:55:
+        If current time is between 12:00 and 17:55:
               Set RTC to turn Pi on at 18:00
               Shut down Pi
 
