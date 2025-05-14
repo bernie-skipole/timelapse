@@ -18,7 +18,7 @@ Pi in low-power mode apart from brief mid-day on-time for the photo, plus an eve
 
 Current status:
 
-writing and testing code to wake around 12:00 and 18:00 each day for ten minutes.
+writing and testing code to wake around 12:00 to take a photo, and 18:00 each day for ten minutes.
 
 To consider:
 
