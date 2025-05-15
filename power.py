@@ -1,12 +1,11 @@
 """
-    From RPi docs, to enable wakeup with the Real Time Clock :
+    From RPi docs, for RPI5, to enable low power mode and wakeup with the Real Time Clock:
 
     $ sudo -E rpi-eeprom-config --edit
 
-    and add the following lines
+    and edit the following line
 
     POWER_OFF_ON_HALT=1
-    WAKE_ON_GPIO=0
 
     test with
 
