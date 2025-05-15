@@ -20,24 +20,9 @@
 
    This script starts as a service on boot (run as root).
 
-   If the hour is 12, take photo, and set
-   the next on time to 18:00 and power off.
-   Checks if the current time is outside the 'on' time of around
-   ten minutes around 18:00, and if it is outside, it sets the next boot
-   time into the RTC and powers off.
-
-   If is inside the on time, it waits 5 seconds and tests again.
-
-   Note, all times are obtained with timezone.utc, if using this in other
-   timezones, this must be altered accordingly.
-
-   Times take no notice of daylight savings time, so midday will always
-   be the timezone midday, not adjusted for DST, and the 18:00 hours
-   will therefore change with respect to local time.
-
    Loop:
 
-        If the hour is 12, and no photo taken yet, then take it, shut down.
+        If the hour is 12, and no photo taken yet, then take it.
 
         If current time is between 12:00 and 17:55:
               Set RTC to turn Pi on at 18:00
@@ -48,6 +33,14 @@
                Shut down Pi
 
         Otherwise, Wait 5 seconds, continue loop
+
+   Note, all times are obtained with timezone.utc, if using this in other
+   timezones, this must be altered accordingly.
+
+   Times take no notice of daylight savings time, so midday will always
+   be the timezone midday, not adjusted for DST, and the 18:00 hours
+   will therefore change with respect to local time.
+
  """
 
 
@@ -83,7 +76,7 @@ def get_epoch():
     """Returns epoch in seconds when the pi should next be powered up, this is
        either at 11:55 or 18:00 depending on which is next.
 
-       If the current hour is 12, takes photo, set epoch to 18:00, return
+       If the current hour is 12, takes photo.
        If the current time is between 12:00 and 17:55, set epoch to 18:00, return
        If current time > 18:10 or < 11:50, set epoch to the following 11:55, return
 
@@ -99,11 +92,6 @@ def get_epoch():
         if timestamp.hour == 12:
             # If the hour hits 12, take the photo
             takephoto(timestamp)
-            # Set RTC to turn Pi on at 18:00
-            evetime = datetime(timestamp.year, timestamp.month, timestamp.day, hour=18, tzinfo=TIMEZONE)
-            # evetime in epoch seconds
-            epoch = int(evetime.timestamp())
-            return epoch
 
         # test if current time >= 12:00 and < 17:55
         # If so, set on-time to 18:00
@@ -143,12 +131,8 @@ if __name__ == "__main__":
     # and if required stop the shutdown.
     time.sleep(240)
 
-    # After the four minutes, if time is right (12:00 midday) this takes photo and returns with the epoch of 18:00
-    # If the current time is 'on-time' within the ten minutes after 18:00 it waits until 'off-time' then returns
-    # the epoch of next wake up time at 11:55 the next day.
-    # This on-time around 18:00 gives a remote user a chance to connect if required.
-    # If the current time is already an 'off-time', it returns immediately with the epoch of
-    # next wake up time.
+    # After the four minutes, if time is right (12:00 midday) this takes photo.
+    # Returns the epoch of the next wake up time.
     epoch = get_epoch()
 
     # print a message with the epoch of the next on-time
