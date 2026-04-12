@@ -70,6 +70,18 @@ def takephoto(timestamp):
     # Note, currently a timestamp is saved rather than a photo
     filepath.write_bytes(timestamp.strftime('%Y%m%d_%H_%M_%S').encode("UTF-8"))
 
+    ##
+    #
+    #  fswebcam -r 1280x720 --no-banner -D 2 -S 15 -F 5 --jpeg 95 filepath
+    #
+    ##
+
+    # subprocess.run(["fswebcam", "-r", "1280x720", "--no-banner", "-D", "2", "-S", "15", "-F", "5", "--jpeg", "95", str(filepath)])
+
+
+
+
+
 
 def get_epoch():
     """Returns epoch in seconds when the pi should next be powered up, this is
