@@ -72,11 +72,13 @@ def takephoto(timestamp):
 
     ##
     #
-    #  fswebcam -r 1280x720 --no-banner -D 2 -S 15 -F 5 --jpeg 95 filepath
+    #  fswebcam -r 4000x3000 --no-banner -D 2 -S 15 --jpeg 95 filepath
+    #
+    # on laptop: fswebcam -r 4000x3000 -d /dev/video2 --no-banner -D 2 -S 15 --jpeg 95 filepath
     #
     ##
 
-    # subprocess.run(["fswebcam", "-r", "1280x720", "--no-banner", "-D", "2", "-S", "15", "-F", "5", "--jpeg", "95", str(filepath)])
+    # subprocess.run(["fswebcam", "-r", "4000x3000", "--no-banner", "-D", "2", "-S", "15", "--jpeg", "95", str(filepath)])
 
 
 
