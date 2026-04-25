@@ -67,20 +67,19 @@ def takephoto(timestamp):
         # This file has already been created
         return
 
-    # Note, currently a timestamp is saved rather than a photo
-    filepath.write_bytes(timestamp.strftime('%Y%m%d_%H_%M_%S').encode("UTF-8"))
-
-    ##
+   ## Use fswebcam to take a photo
     #
-    #  fswebcam -r 4000x3000 --no-banner -D 2 -S 15 --jpeg 95 filepath
+    #  fswebcam -r 4000x3000 --set "Auto Exposure=Manual Mode" --set "Exposure Time, Absolute=10" --no-banner -D 4 -S 12 --jpeg 95 filepath
     #
-    # on laptop: fswebcam -r 4000x3000 -d /dev/video2 --no-banner -D 2 -S 15 --jpeg 95 filepath
+    # on laptop: fswebcam -r 4000x3000 -d /dev/video2 --no-banner -D 2 -S 12 --jpeg 95 filepath
     #
     ##
 
-    # subprocess.run(["fswebcam", "-r", "4000x3000", "--no-banner", "-D", "2", "-S", "15", "--jpeg", "95", str(filepath)])
-
-
+    subprocess.run(["fswebcam", "-r", "4000x3000",
+                    "--set", "Auto Exposure=Manual Mode",
+                    "--set", "Exposure Time, Absolute=10",
+                    "--no-banner",
+                    "-D", "4", "-S", "12", "--jpeg", "95", str(filepath)])
 
 
 
