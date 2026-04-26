@@ -59,7 +59,7 @@ def takephoto(timestamp):
 
     timestampstring = timestamp.strftime('%Y%m%d')
 
-    filename =  f"image_{timestampstring}.txt"
+    filename =  f"image_{timestampstring}.jpeg"
 
     filepath = IMAGES / filename
 
