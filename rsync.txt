@@ -1,0 +1,8 @@
+
+
+## command to copy files from Raspberry Pi 'timelapse' to local
+
+
+rsync -uav -e ssh  bernard@timelapse:/home/bernard/git/timelapse/images/ ~/git/timelapse/images/
+
+

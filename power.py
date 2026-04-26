@@ -13,8 +13,8 @@
     $ sudo halt
 
     ----------------------------------------------------------------
-    For photo taking, see
-    https://datasheets.raspberrypi.com/camera/picamera2-manual.pdf
+    For photo taking using usb webcam use fswebcam which needs to be
+    installed with apt 
     ----------------------------------------------------------------
 
    This script starts as a service on boot (run as root).
@@ -67,11 +67,11 @@ def takephoto(timestamp):
         # This file has already been created
         return
 
-   ## Use fswebcam to take a photo
+    ## Use fswebcam to take a photo
     #
     #  fswebcam -r 4000x3000 --set "Auto Exposure=Manual Mode" --set "Exposure Time, Absolute=10" --no-banner -D 4 -S 12 --jpeg 95 filepath
     #
-    # on laptop: fswebcam -r 4000x3000 -d /dev/video2 --no-banner -D 2 -S 12 --jpeg 95 filepath
+    # testing on laptop: fswebcam -r 4000x3000 -d /dev/video2 --no-banner -D 2 -S 12 --jpeg 95 filepath
     #
     ##
 
