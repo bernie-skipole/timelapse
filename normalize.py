@@ -3,7 +3,7 @@ Normalises images from /home/bernard/git/timelapse/images
 
 and tries to average out changes in exposure to set new images into
 
-/home/bernard/git/timelapse/neimages
+/home/bernard/git/timelapse/newimages
 """
 
 import os
@@ -11,12 +11,13 @@ from PIL import Image, ImageEnhance
 
 
 def getbrightness(img):
+    "From kmohrf/brightness.py"
     greyscale = img.convert('L')
-    hgram = greyscale.histogram()
+    hgram = greyscale.histogram()  # a list of pixel counts, one for each pixel value in the source image
     pixels = sum(hgram)
-    brightness = scale = len(hgram)
+    brightness = scale = len(hgram)   # number of discrete pixel values
 
-    for index in range(0, scale):
+    for index in range(0, scale):     # for every hgram 
         ratio = hgram[index] / pixels
         brightness += ratio * (-scale + index)
 
@@ -38,6 +39,8 @@ if __name__ == '__main__':
         elif b<0.48:
             enhancer = ImageEnhance.Brightness(img)
             img = enhancer.enhance(0.48/b)
+
+
         img.save(putfiles+filename)
 
 
