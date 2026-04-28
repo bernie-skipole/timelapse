@@ -57,7 +57,7 @@ def takephoto(timestamp):
        the timestamp is used to create the filename
     """
 
-    timestampstring = timestamp.strftime('%Y%m%d%H')
+    timestampstring = timestamp.strftime('%Y%m%d')
 
     filename =  f"image_{timestampstring}.jpeg"
 
@@ -101,21 +101,14 @@ def get_epoch():
 
         timestamp = datetime.now(tz=TIMEZONE)
 
-        if timestamp.hour in (10, 11, 12, 13, 14):
-            # Take the photo
+        if timestamp.hour == 12:
+            # If the hour hits 12, take the photo
             takephoto(timestamp)
 
-        # test for current time, and return next on-time
+        # test if current time >= 12:00 and < 17:55
+        # If so, set on-time to 18:00
 
-        for hr in range(10, 14):    # hr is 10, 11, 12, 13
-            if (timestamp.hour == hr and timestamp.minute < 55):
-                # Set RTC to turn Pi on at hr plus 1
-                nexttime = datetime(timestamp.year, timestamp.month, timestamp.day, hour=hr+1, tzinfo=TIMEZONE)
-                # next hour in epoch seconds
-                epoch = int(nexttime.timestamp())
-                return epoch
-
-        if ((timestamp.hour >= 14 and timestamp.hour < 17) or
+        if ((timestamp.hour >= 12 and timestamp.hour < 17) or
             (timestamp.hour == 17 and timestamp.minute < 55)):
             # Set RTC to turn Pi on at 18:00
             evetime = datetime(timestamp.year, timestamp.month, timestamp.day, hour=18, tzinfo=TIMEZONE)
@@ -123,18 +116,18 @@ def get_epoch():
             epoch = int(evetime.timestamp())
             return epoch
 
-        # test if current time > 18:10 or < 9:50
-        # If so, set on-time to the following 9:55
+        # test if current time > 18:10 or < 11:50
+        # If so, set on-time to the following 11:55
 
-        if (timestamp.hour >= 19 or timestamp.hour < 9 or
-            (timestamp.hour == 9 and timestamp.minute < 50) or
+        if (timestamp.hour >= 19 or timestamp.hour < 11 or
+            (timestamp.hour == 11 and timestamp.minute < 50) or
             (timestamp.hour == 18 and timestamp.minute > 10)):
-            # Set RTC to turn Pi on at 9:55
-            nexttime = datetime(timestamp.year, timestamp.month, timestamp.day, hour=9, minute=55, tzinfo=TIMEZONE)
+            # Set RTC to turn Pi on at 11:55
+            midday = datetime(timestamp.year, timestamp.month, timestamp.day, hour=11, minute=55, tzinfo=TIMEZONE)
             if timestamp.hour >= 18:
-                # get next day
-                nexttime = nexttime + timedelta(days=1)
-            epoch = int(nexttime.timestamp())
+                # get midday of next day
+                midday = midday + timedelta(days=1)
+            epoch = int(midday.timestamp())
             return epoch
 
         # still on-time, wait 5 seconds and continue
@@ -150,7 +143,7 @@ if __name__ == "__main__":
     # and if required stop the shutdown.
     time.sleep(240)
 
-    # After the four minutes, if time is right (10:00, 11:00, 12:00, 13:00, 14:00) this takes photo.
+    # After the four minutes, if time is right (12:00 midday) this takes photo.
     # Returns the epoch of the next wake up time.
     epoch = get_epoch()
 
