@@ -43,13 +43,32 @@
  """
 
 
-import sys, time, subprocess, pathlib
+import sys, time, subprocess, pathlib, os
 
 from datetime import datetime, timezone, timedelta
+
+from PIL import Image, ImageEnhance
+
+
+
 
 TIMEZONE = timezone.utc
 
 IMAGES = pathlib.Path("/home/bernard/git/timelapse/images")
+
+
+def getbrightness(img):
+    "From kmohrf/brightness.py"
+    greyscale = img.convert('L')
+    hgram = greyscale.histogram()  # a list of pixel counts, one for each pixel value in the source image
+    pixels = sum(hgram)
+    brightness = scale = len(hgram)   # number of discrete pixel values
+
+    for index in range(0, scale):     # for every hgram 
+        ratio = hgram[index] / pixels
+        brightness += ratio * (-scale + index)
+
+    return 1 if brightness == 255 else brightness / scale
 
 
 def takephoto(timestamp):
@@ -82,6 +101,28 @@ def takephoto(timestamp):
                     "--set", "Exposure Time, Absolute=10",
                     "--no-banner",
                     "-D", "4", "-S", "12", "--jpeg", "95", str(filepath)])
+
+    img = Image.open(str(filepath))
+    b = getbrightness(img)
+    if b>0.58:
+        # remove file and take again with shorter exposure
+        os.remove(filepath)
+        subprocess.run(["fswebcam", "-r", "4000x3000",
+                        "--set", "Auto Exposure=Manual Mode",
+                        "--set", "Exposure Time, Absolute=9",
+                        "--no-banner",
+                        "-D", "4", "-S", "12", "--jpeg", "95", str(filepath)])
+    if b<0.42:
+        # remove file and take again with longer exposure
+        os.remove(filepath)
+        subprocess.run(["fswebcam", "-r", "4000x3000",
+                        "--set", "Auto Exposure=Manual Mode",
+                        "--set", "Exposure Time, Absolute=11",
+                        "--no-banner",
+                        "-D", "4", "-S", "12", "--jpeg", "95", str(filepath)])
+    img.close()
+
+
 
 
 
