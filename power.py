@@ -21,14 +21,16 @@
 
    Loop:
 
-        If the hour is 12, and no photo taken yet, then take it.
+        If the hour is 10, 11, 12, 13 or 14 and no photo taken yet, then take it.
 
-        If current time is between 12:00 and 17:55:
+        If the hour is one of 10, 11, 12, 13 set RTC to turn Pi on at hour plus one 
+
+        If current time is between 14:00 and 17:55:
               Set RTC to turn Pi on at 18:00
               Shut down Pi
 
-        If current time is between 18:10 and 11:50 next day:
-               Set RTC to turn Pi on at 11:55
+        If current time is between 18:10 and 9:50 next day:
+               Set RTC to turn Pi on at 9:55
                Shut down Pi
 
         Otherwise, Wait 5 seconds, continue loop
@@ -36,10 +38,7 @@
    Note, all times are obtained with timezone.utc, if using this in other
    timezones, this must be altered accordingly.
 
-   Times take no notice of daylight savings time, so midday will always
-   be the timezone midday, not adjusted for DST, and the 18:00 hours
-   will therefore change with respect to local time.
-
+   Times take no notice of daylight savings time.
  """
 
 
@@ -88,14 +87,21 @@ def takephoto(timestamp):
 
 def get_epoch():
     """Returns epoch in seconds when the pi should next be powered up, this is
-       either at 11:55 or 18:00 depending on which is next.
+       either at 9:55, 10:00, 11:00, 12:00, 13:00, 14:00 or 18:00 depending on which is next.
 
-       If the current hour is 12, takes photo.
-       If the current time is between 12:00 and 17:55, set epoch to 18:00, return
-       If current time > 18:10 or < 11:50, set epoch to the following 11:55, return
+       If the current hour is 10, 11, 12, 13 or 14, takes photo.
+ 
+       If the hour is one of 10, 11, 12, 13 set RTC to turn Pi on at hour plus one 
 
-       If none of the above, wait five seconds and test again. This ensures the pi
-       is on and available for remote connection between 18:00 and 18:10.
+       If current time is between 14:00 and 17:55:
+              Set RTC to turn Pi on at 18:00
+              Shut down Pi
+
+       If current time is between 18:10 and 9:50 next day:
+              Set RTC to turn Pi on at 9:55
+              Shut down Pi
+
+       Otherwise, Wait 5 seconds, continue loop
     """
 
 
