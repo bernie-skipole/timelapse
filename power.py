@@ -160,7 +160,13 @@ if __name__ == "__main__":
 
     # After the four minutes, if time is right (10:00, 11:00, 12:00, 13:00, 14:00) this takes photo.
     # Returns the epoch of the next wake up time.
-    epoch = get_epoch()
+    try:
+        epoch = get_epoch()
+    except:
+        # on any failure, set epoch to 9:55 next day
+        timestamp = datetime.now(tz=TIMEZONE) + timedelta(days=1)
+        nexttime = datetime(timestamp.year, timestamp.month, timestamp.day, hour=9, minute=55, tzinfo=TIMEZONE)
+        epoch = int(nexttime.timestamp())
 
     # print a message with the epoch of the next on-time
     print(f"Setting wakealarm at epoch {epoch}")
