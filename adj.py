@@ -1,11 +1,12 @@
 from pathlib import Path
 
+import shutil
+
 from PIL import Image
 
 
 gammabrighten = lambda i: int(((i / 255.0) ** (1.0 / 2.0)) * 255)
 gammabrightenabit = lambda i: int(((i / 255.0) ** (1.0 / 1.5)) * 255)
-gammadarken = lambda i: int(((i / 255.0) ** (1.0 / 0.8)) * 255)
 
 
 def get_range(x,y):
@@ -32,27 +33,23 @@ in_path = Path("images")
 
 # Loop through jpeg files inside the 'in' folder
 for file_path in in_path.glob('*.jpeg'):
+    output_file = Path("out", file_path.name)
     # Open the image
     img = Image.open(file_path)
     b = get_brightness(img)
-    if b>0.5:
-        corrected_img = img.point(gammadarken)
-        # Save the image to out
-        corrected_img.save(Path("out", file_path.name))
-        corrected_img.close()
-    elif b<0.1:
+    if b<0.1:
         corrected_img = img.point(gammabrighten)
         # Save the image to out
-        corrected_img.save(Path("out", file_path.name))
+        corrected_img.save(output_file, quality=95)
         corrected_img.close()
     elif b<0.2:
         corrected_img = img.point(gammabrightenabit)
         # Save the image to out
-        corrected_img.save(Path("out", file_path.name))
+        corrected_img.save(output_file, quality=95)
         corrected_img.close()
     else:
         # Save the unaltered image to out
-        img.save(Path("out", file_path.name))
+        shutil.copy(file_path, output_file)
     img.close()
     print(file_path.name)
 
