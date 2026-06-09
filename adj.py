@@ -1,7 +1,5 @@
 from pathlib import Path
 
-import shutil
-
 from PIL import Image
 
 
@@ -32,6 +30,7 @@ def get_brightness(img):
 in_path = Path("images")
 
 # Loop through jpeg files inside the 'in' folder
+# correct the images, then save them to the out folder
 for file_path in in_path.glob('*.jpeg'):
     output_file = Path("out", file_path.name)
     # Open the image
@@ -40,16 +39,16 @@ for file_path in in_path.glob('*.jpeg'):
     if b<0.1:
         corrected_img = img.point(gammabrighten)
         # Save the image to out
-        corrected_img.save(output_file, quality=95)
+        corrected_img.save(output_file)
         corrected_img.close()
     elif b<0.2:
         corrected_img = img.point(gammabrightenabit)
         # Save the image to out
-        corrected_img.save(output_file, quality=95)
+        corrected_img.save(output_file)
         corrected_img.close()
     else:
         # Save the unaltered image to out
-        shutil.copy(file_path, output_file)
+        img.save(output_file)
     img.close()
     print(file_path.name)
 
