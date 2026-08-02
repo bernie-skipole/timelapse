@@ -1,0 +1,33 @@
+
+Trying the following rule:
+
+Brightness -> Exposure
+
+<.15       -> 50
+
+<.2        -> 20
+
+<.25       -> 15
+
+Default    -> 10
+
+Several images with different exposures were made, and best result judged
+
+Image                       brightness    best exposure    Calculated exposure
+
+image_2026072514.jpeg       0.097         50               50
+
+image_2026072814.jpeg       0.187         20               20
+
+image_2026072911.jpeg       0.202         15-20            15
+
+image_2026073010.jpeg       0.12          50               50
+
+image_2026073110.jpeg       0.176         15               20
+
+image_2026073113.jpeg       0.247         15-20            15
+
+image_2026080111.jpeg       0.246         15               15
+
+
+
